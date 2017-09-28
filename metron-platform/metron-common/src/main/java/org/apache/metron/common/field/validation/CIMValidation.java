@@ -1,6 +1,7 @@
 package org.apache.metron.common.field.validation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.vfs2.provider.sftp.TrustEveryoneUserInfo;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -11,7 +12,7 @@ import org.apache.metron.common.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.math.Ordering;
-
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -28,7 +29,7 @@ public class CIMValidation extends SimpleValidation {
     protected static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
-    HashMap<String, String> cim = new HashMap();
+    HashMap<String, ArrayList<String>> cim = new HashMap();
     JSONObject jsonObject;
     @Override
     public boolean isValid( Map<String, Object> input
@@ -68,11 +69,10 @@ public class CIMValidation extends SimpleValidation {
 
     @Override
     public void initialize(Map<String, Object> validationConfig, Map<String, Object> globalConfig) {
-        cim.put( "src_ip", "src_ip");
-        cim.put( "1dst_ip", "1dst_ip");
+
         try {
         InputStream commonInputStream = openInputStream(taxonomyCommonDir);
-        HashMap<String, String> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, String>>() {
+        HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
         });
         cim=cim2;
 
@@ -84,11 +84,19 @@ public class CIMValidation extends SimpleValidation {
 
         @Override
     public Predicate<Object> getPredicate() {
-        return s -> cim.containsValue(s) ;
+        return s -> arraysContain(s);
     }
+
 
     @Override
     protected boolean isNonExistentOk() {
+        return false;
+    }
+
+    protected boolean arraysContain(Object s){
+        for(ArrayList value : cim.values()) {
+            if(value.contains(s)) return value.contains(s);
+        }
         return false;
     }
 

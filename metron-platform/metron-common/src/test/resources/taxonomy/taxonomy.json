@@ -1,4 +1,4 @@
 {
-  "src_ip": "src_ip",
-  "dst_ip": "dst_ip"
+  "src_ip": ["src_ip", "src_ipaddr", "srcip", "source_ip" ] ,
+  "dst_ip": [ "dst_ip", "dst_ipaddr", "dstip", "destination_i" ]
 }

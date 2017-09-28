@@ -58,7 +58,7 @@ public class CIMValidationTest extends BaseValidationTest {
 
     @Test
     public void positiveTest_single() throws IOException {
-        Assert.assertTrue(execute(validWithSingleField, ImmutableMap.of("src_ip", "1.1.1.1")));
+        Assert.assertTrue(execute(validWithSingleField, ImmutableMap.of("source_ip", "1.1.1.1")));
     }
     @Test
     public void negativeTest_single() throws IOException {
