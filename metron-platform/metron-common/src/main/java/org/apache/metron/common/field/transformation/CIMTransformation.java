@@ -31,7 +31,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class CIMTransformation implements FieldTransformation {
+@Stellar(name="CIM"
+        , description=" "
+        , params = {" "}
+        , returns = " "
+)
+public class CIMTransformation implements FieldTransformation, StellarFunction {
 
     protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
     HashMap<String, ArrayList<String>> cim = new HashMap();
@@ -76,6 +81,20 @@ public class CIMTransformation implements FieldTransformation {
         }
 
         return ret;
+    }
+    @Override
+    public Object apply(List<Object> objects, Context context) throws ParseException {
+        return true;
+    }
+
+    @Override
+    public void initialize(Context context) {
+
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return true;
     }
 
     public InputStream openInputStream(String streamName) throws IOException {

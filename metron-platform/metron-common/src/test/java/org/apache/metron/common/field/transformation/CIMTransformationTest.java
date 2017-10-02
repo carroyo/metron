@@ -58,10 +58,9 @@ public class CIMTransformationTest {
       }});
       handler.transformAndUpdate(input, Context.EMPTY_CONTEXT());
 
-      Assert.assertTrue(input.containsKey("src_ip"));
+      Assert.assertTrue(input.containsKey("ip_src_addr"));
       Assert.assertFalse(input.containsKey("srcip"));
       Assert.assertTrue(input.containsKey("field"));
-      Assert.assertTrue(input.containsKey("dst_ip"));
 
     }
     {
@@ -70,8 +69,8 @@ public class CIMTransformationTest {
         put("dst_ip", "bar");
       }});
       handler.transformAndUpdate(input, Context.EMPTY_CONTEXT());
-      Assert.assertTrue(input.containsKey("src_ip"));
-      Assert.assertTrue(input.containsKey("dst_ip"));
+      Assert.assertTrue(input.containsKey("ip_src_addr"));
+      Assert.assertTrue(input.containsKey("ip_dst_addr"));
     }
     {
       JSONObject input = new JSONObject(new HashMap<String, Object>() {{
@@ -80,7 +79,7 @@ public class CIMTransformationTest {
       }});
       handler.transformAndUpdate(input, Context.EMPTY_CONTEXT());
       Assert.assertFalse(input.containsKey("dst_ip"));
-      Assert.assertTrue(input.containsKey("src_ip"));
+      Assert.assertTrue(input.containsKey("ip_src_addr"));
     }
   }
 }
