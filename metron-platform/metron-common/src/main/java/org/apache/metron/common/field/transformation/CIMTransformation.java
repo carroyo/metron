@@ -41,7 +41,7 @@ public class CIMTransformation implements FieldTransformation, StellarFunction {
     protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
     HashMap<String, ArrayList<String>> cim = new HashMap();
 
-    public void initialize() {
+    public void initialize2() {
 
         try {
             InputStream commonInputStream = openInputStream(taxonomyCommonDir);
@@ -89,6 +89,15 @@ public class CIMTransformation implements FieldTransformation, StellarFunction {
 
     @Override
     public void initialize(Context context) {
+        try {
+            InputStream commonInputStream = openInputStream(taxonomyCommonDir);
+            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
+            });
+            cim=cim2;
+
+        } catch (Throwable e) {
+            throw new RuntimeException("CIMTransformation taxonomy reading Error: " + e.getMessage(), e);
+        }
 
     }
 
