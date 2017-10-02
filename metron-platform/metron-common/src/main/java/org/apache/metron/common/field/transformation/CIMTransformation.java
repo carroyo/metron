@@ -61,17 +61,19 @@ public class CIMTransformation implements FieldTransformation {
         Set<String> cimFields=cim.keySet();
         Map<String, Object> ret = new HashMap<>();
 
-        input.forEach( (k,v) -> {
-            if( cimFields.contains(k)) {ret.put(k,v);return;}
-            for (Map.Entry<String, ArrayList<String>> entry : cim.entrySet())
+        for(Map.Entry<String, Object> entry : input.entrySet()) {
+            String k = entry.getKey();
+            String v = (String) entry.getValue();
+            if( cimFields.contains(k)) {ret.put(k,v);continue;}
+            for (Map.Entry<String, ArrayList<String>> entryCim : cim.entrySet())
             {
-                if(entry.getValue().contains(k)){
-                    ret.put(entry.getKey(),v);
+                if(entryCim.getValue().contains(k)){
+                    ret.put(entryCim.getKey(),v);
                     ret.put(k,null);
                 }
             }
 
-        });
+        }
 
         return ret;
     }
