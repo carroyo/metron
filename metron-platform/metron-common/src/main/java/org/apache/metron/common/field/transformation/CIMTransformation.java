@@ -62,7 +62,7 @@ public class CIMTransformation implements FieldTransformation, StellarFunction {
             , Map<String, Object>... sensorConfig
     ) {
 
-        initialize();
+        initialize2();
         Set<String> cimFields=cim.keySet();
         Map<String, Object> ret = new HashMap<>();
 
