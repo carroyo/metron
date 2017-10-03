@@ -31,10 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-@Stellar(name="CIM"
-        , description=" "
-        , params = {" "}
-        , returns = " "
+@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
+        , name="CIM"
+        , description=" Taxonomy fields adjustments"
+        , params = {}
+        , returns = "message"
 )
 public class CIMTransformation implements FieldTransformation, StellarFunction {
 
