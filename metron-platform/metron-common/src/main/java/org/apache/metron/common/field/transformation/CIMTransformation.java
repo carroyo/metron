@@ -31,16 +31,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
-        , name="CIM"
-        , description=" Taxonomy fields adjustments"
-        , params = {}
-        , returns = "message"
-)
-public class CIMTransformation implements FieldTransformation, StellarFunction {
+//@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
+//        , name="CIM"
+//        , description=" Taxonomy fields adjustments"
+//        , params = {}
+//        , returns = "message"
+//)
+public class CIMTransformation implements FieldTransformation {
 
     protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
     HashMap<String, ArrayList<String>> cim = new HashMap();
+
+    public static final StellarPredicateProcessor PASSTHROUGH_PROCESSOR = new StellarPredicateProcessor() {
+        @Override
+        public Boolean parse(String rule, VariableResolver resolver, FunctionResolver functionResolver, Context context) {
+            return true;
+        }
+
+        @Override
+        public boolean validate(String rule) throws ParseException {
+            return true;
+        }
+
+        @Override
+        public boolean validate(String rule, boolean throwException, Context context) throws ParseException {
+            return true;
+        }
+    };
+    private StellarPredicateProcessor getPredicateProcessor()
+    {
+            return PASSTHROUGH_PROCESSOR;
+
+    }
 
     public void initialize2() {
 
@@ -83,29 +105,26 @@ public class CIMTransformation implements FieldTransformation, StellarFunction {
 
         return ret;
     }
-    @Override
-    public Object apply(List<Object> objects, Context context) throws ParseException {
-        return true;
-    }
 
-    @Override
-    public void initialize(Context context) {
-        try {
-            InputStream commonInputStream = openInputStream(taxonomyCommonDir);
-            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
-            });
-            cim=cim2;
 
-        } catch (Throwable e) {
-            throw new RuntimeException("CIMTransformation taxonomy reading Error: " + e.getMessage(), e);
-        }
+//    @Override
+//    public void initialize(Context context) {
+//        try {
+//            InputStream commonInputStream = openInputStream(taxonomyCommonDir);
+//            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
+//       });
+//       cim=cim2;
+//
+//   } catch (Throwable e) {
+//       throw new RuntimeException("CIMTransformation taxonomy reading Error: " + e.getMessage(), e);
+//   }
+//
+//
 
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return true;
-    }
+//    @Override
+//    public boolean isInitialized() {
+//        return true;
+//    }
 
     public InputStream openInputStream(String streamName) throws IOException {
         FileSystem fs = FileSystem.get(new Configuration());
