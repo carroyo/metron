@@ -27,6 +27,7 @@ import org.apache.metron.stellar.dsl.*;
 import org.apache.metron.stellar.dsl.functions.resolver.FunctionResolver;
 import org.apache.metron.stellar.common.StellarPredicateProcessor;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -68,7 +69,7 @@ public class CIMTransformation implements FieldTransformation {
 
         try {
             InputStream commonInputStream = openInputStream(taxonomyCommonDir);
-            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
+            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(new BufferedInputStream(commonInputStream), new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
 
