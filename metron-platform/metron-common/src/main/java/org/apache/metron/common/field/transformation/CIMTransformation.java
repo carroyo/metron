@@ -40,7 +40,7 @@ import java.util.*;
 //)
 public class CIMTransformation implements FieldTransformation {
 
-    protected String taxonomyCommonDir = "taxonomy/taxonomy.json";
+    protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
     HashMap<String, ArrayList<String>> cim = new HashMap();
 
     public static final StellarPredicateProcessor PASSTHROUGH_PROCESSOR = new StellarPredicateProcessor() {
