@@ -68,8 +68,8 @@ public class CIMTransformation implements FieldTransformation {
     public void initialize2() {
 
         try {
-            InputStream commonInputStream = openInputStream(taxonomyCommonDir);
-            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(new BufferedInputStream(commonInputStream), new TypeReference<HashMap<String, ArrayList<String>>>() {
+            InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonDir);
+            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(new BufferedInputStream(taxonomyStream), new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
 
