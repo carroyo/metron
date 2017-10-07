@@ -71,12 +71,13 @@ public class CIMTransformation implements FieldTransformation {
     public void initialize() {
 
         try {
-            Path path = new Path(taxonomyCommonFile);
-            Configuration conf = new Configuration();
-            FileSystem fs = path.getFileSystem(conf);
-            FSDataInputStream inputStream = fs.open(path);
+//            Path path = new Path(taxonomyCommonFile);
+//            Configuration conf = new Configuration();
+//            FileSystem fs = path.getFileSystem(conf);
+//            FSDataInputStream inputStream = fs.open(path);
  //           InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonFile);
    //         InputStream inputStream = new BufferedInputStream(taxonomyStream);
+             InputStream inputStream =  openInputStream(taxonomyCommonFile);
             HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(inputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
@@ -135,13 +136,13 @@ public class CIMTransformation implements FieldTransformation {
 //        return true;
 //    }
 
-//    public InputStream openInputStream(String streamName) throws IOException {
-//        FileSystem fs = FileSystem.get(new Configuration());
-//        Path path = new Path(streamName);
-//        if(fs.exists(path)) {
-//            return fs.open(path);
-//        } else {
-//            return getClass().getResourceAsStream(streamName);
-//        }
-//    }
+    public InputStream openInputStream(String streamName) throws IOException {
+        FileSystem fs = FileSystem.get(new Configuration());
+        Path path = new Path(streamName);
+        if(fs.exists(path)) {
+            return fs.open(path);
+        } else {
+            return getClass().getResourceAsStream(streamName);
+        }
+    }
 }
