@@ -20,6 +20,8 @@ package org.apache.metron.common.field.transformation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.metron.common.utils.JSONUtils;
@@ -30,6 +32,7 @@ import org.apache.metron.stellar.common.StellarPredicateProcessor;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 //@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
@@ -40,7 +43,7 @@ import java.util.*;
 //)
 public class CIMTransformation implements FieldTransformation {
 
-    protected String taxonomyCommonDir = "/taxonomy/taxonomy.json";
+    protected String taxonomyCommonFile = "/taxonomy/taxonomy.json";
     HashMap<String, ArrayList<String>> cim = new HashMap();
 
     public static final StellarPredicateProcessor PASSTHROUGH_PROCESSOR = new StellarPredicateProcessor() {
@@ -65,11 +68,16 @@ public class CIMTransformation implements FieldTransformation {
 
     }
 
-    public void initialize2() {
+    public void initialize() {
 
         try {
-            InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonDir);
-            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(new BufferedInputStream(taxonomyStream), new TypeReference<HashMap<String, ArrayList<String>>>() {
+            Path path = new Path(taxonomyCommonFile);
+            Configuration conf = new Configuration();
+            FileSystem fs = path.getFileSystem(conf);
+            FSDataInputStream inputStream = fs.open(path);
+ //           InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonFile);
+   //         InputStream inputStream = new BufferedInputStream(taxonomyStream);
+            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(inputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
 
@@ -86,7 +94,7 @@ public class CIMTransformation implements FieldTransformation {
             , Map<String, Object>... sensorConfig
     ) {
 
-        initialize2();
+        initialize();
         Set<String> cimFields=cim.keySet();
         Map<String, Object> ret = new HashMap<>();
 
@@ -127,13 +135,13 @@ public class CIMTransformation implements FieldTransformation {
 //        return true;
 //    }
 
-    public InputStream openInputStream(String streamName) throws IOException {
-        FileSystem fs = FileSystem.get(new Configuration());
-        Path path = new Path(streamName);
-        if(fs.exists(path)) {
-            return fs.open(path);
-        } else {
-            return getClass().getResourceAsStream(streamName);
-        }
-    }
+//    public InputStream openInputStream(String streamName) throws IOException {
+//        FileSystem fs = FileSystem.get(new Configuration());
+//        Path path = new Path(streamName);
+//        if(fs.exists(path)) {
+//            return fs.open(path);
+//        } else {
+//            return getClass().getResourceAsStream(streamName);
+//        }
+//    }
 }
