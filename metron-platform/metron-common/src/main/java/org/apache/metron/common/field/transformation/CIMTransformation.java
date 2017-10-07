@@ -20,7 +20,6 @@ package org.apache.metron.common.field.transformation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -32,7 +31,6 @@ import org.apache.metron.stellar.common.StellarPredicateProcessor;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
 //@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
@@ -78,6 +76,9 @@ public class CIMTransformation implements FieldTransformation {
  //           InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonFile);
    //         InputStream inputStream = new BufferedInputStream(taxonomyStream);
              InputStream inputStream =  openInputStream(taxonomyCommonFile);
+               BufferedInputStream a = new BufferedInputStream(inputStream) ;
+             Integer test=a.read();
+             System.out.println(test);
             HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(inputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
