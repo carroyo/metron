@@ -102,6 +102,7 @@ public class CIMTransformation implements FieldTransformation {
 
         for(Map.Entry<String, Object> entry : input.entrySet()) {
             String k = entry.getKey();
+            System.out.println(k+v);
             String v = (String) entry.getValue();
             if( cimFields.contains(k)) {ret.put(k,v);continue;}
             for (Map.Entry<String, ArrayList<String>> entryCim : cim.entrySet())
