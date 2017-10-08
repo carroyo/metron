@@ -76,9 +76,9 @@ public class CIMTransformation implements FieldTransformation {
  //           InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonFile);
    //         InputStream inputStream = new BufferedInputStream(taxonomyStream);
              InputStream inputStream =  openInputStream(taxonomyCommonFile);
-               BufferedInputStream a = new BufferedInputStream(inputStream) ;
-             Integer test=a.read();
-             System.out.println(test);
+//               BufferedInputStream a = new BufferedInputStream(inputStream) ;
+//             Integer test=a.read();
+//             System.out.println(test);
             HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(inputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
