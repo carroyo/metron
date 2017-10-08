@@ -28,17 +28,11 @@ import org.apache.metron.stellar.dsl.*;
 import org.apache.metron.stellar.dsl.functions.resolver.FunctionResolver;
 import org.apache.metron.stellar.common.StellarPredicateProcessor;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-//@Stellar( namespace = "PARSER_STELLAR_TRANSFORM"
-//        , name="CIM"
-//        , description=" Taxonomy fields adjustments"
-//        , params = {}
-//        , returns = "message"
-//)
+
 public class CIMTransformation implements FieldTransformation {
 
     protected String taxonomyCommonFile = "/taxonomy/taxonomy.json";
@@ -69,16 +63,8 @@ public class CIMTransformation implements FieldTransformation {
     public void initialize() {
 
         try {
-//            Path path = new Path(taxonomyCommonFile);
-//            Configuration conf = new Configuration();
-//            FileSystem fs = path.getFileSystem(conf);
-//            FSDataInputStream inputStream = fs.open(path);
- //           InputStream taxonomyStream = this.getClass().getResourceAsStream(taxonomyCommonFile);
-   //         InputStream inputStream = new BufferedInputStream(taxonomyStream);
+
              InputStream inputStream =  openInputStream(taxonomyCommonFile);
-//               BufferedInputStream a = new BufferedInputStream(inputStream) ;
-//             Integer test=a.read();
-//             System.out.println(test);
             HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(inputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
             });
             cim=cim2;
@@ -102,8 +88,6 @@ public class CIMTransformation implements FieldTransformation {
 
         for(Map.Entry<String, Object> entry : input.entrySet()) {
             String k = entry.getKey();
-            System.out.println(k);
-            System.out.println(entry.getValue());
             Object v =  entry.getValue();
             if( cimFields.contains(k)) {ret.put(k,v);continue;}
             for (Map.Entry<String, ArrayList<String>> entryCim : cim.entrySet())
@@ -120,24 +104,6 @@ public class CIMTransformation implements FieldTransformation {
     }
 
 
-//    @Override
-//    public void initialize(Context context) {
-//        try {
-//            InputStream commonInputStream = openInputStream(taxonomyCommonDir);
-//            HashMap<String, ArrayList<String>> cim2 = JSONUtils.INSTANCE.load(commonInputStream, new TypeReference<HashMap<String, ArrayList<String>>>() {
-//       });
-//       cim=cim2;
-//
-//   } catch (Throwable e) {
-//       throw new RuntimeException("CIMTransformation taxonomy reading Error: " + e.getMessage(), e);
-//   }
-//
-//
-
-//    @Override
-//    public boolean isInitialized() {
-//        return true;
-//    }
 
     public InputStream openInputStream(String streamName) throws IOException {
         FileSystem fs = FileSystem.get(new Configuration());
