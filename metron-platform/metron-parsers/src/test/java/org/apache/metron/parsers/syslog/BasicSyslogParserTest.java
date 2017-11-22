@@ -86,21 +86,19 @@ public class BasicSyslogParserTest {
         String rawMessage = "<164>Nov 22 20:39:23 metron su: pam_unix(su:session): session closed for user root";
         JSONObject asaJson = syslogParser.parse(rawMessage.getBytes()).get(0);
         assertEquals(asaJson.get("original_string"), rawMessage);
-        assertTrue(asaJson.get("user").equals("root"));
+        assertTrue(asaJson.get("user_su").equals("root"));
         assertTrue(asaJson.get("action").equals("session closed"));
         assertTrue((long) asaJson.get("timestamp") == 1511383163000L);
     }
 
     @Test
     public void testSSH() {
-        String rawMessage = "<162>Nov 22 21:08:39 metron sshd[7727]: Accepted publickey for centos from 172.24.4.1 port 43326 ssh2: RSA SHA256:iRj5Z9wt713JtJZdiMBtdvqCYUEQBZfiyDJECyw16aM";
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: Accepted publickey for centos from 172.24.4.1 port 43326 ssh2: RSA SHA256:iRj5Z9wt713JtJZdiMBtdvqCYUEQBZfiyDJECyw16aM";
         JSONObject asaJson = syslogParser.parse(rawMessage.getBytes()).get(0);
         assertEquals(asaJson.get("original_string"), rawMessage);
-        assertTrue(asaJson.get("ip_src_addr").equals("10.25.177.164"));
-        assertTrue(asaJson.get("ip_dst_addr").equals("10.2.52.71"));
-        assertTrue(asaJson.get("ip_src_port").equals(63279));
-        assertTrue(asaJson.get("ip_dst_port").equals(161));
-        assertTrue((long) asaJson.get("timestamp") == 1470358945000L);
+        assertTrue(asaJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue(asaJson.get("ip_src_port").equals(43326));
+        assertTrue((long) asaJson.get("timestamp") == 1511383163000L);
     }
 
 
