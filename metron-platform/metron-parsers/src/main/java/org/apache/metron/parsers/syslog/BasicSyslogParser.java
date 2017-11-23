@@ -21,6 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.map.MultiValueMap;
+
 import org.apache.metron.common.Constants;
 import org.apache.metron.parsers.BasicParser;
 import org.apache.metron.parsers.ParseException;
@@ -28,6 +31,7 @@ import org.apache.metron.parsers.utils.SyslogUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.collections.MultiMap;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,12 +54,17 @@ public class BasicSyslogParser extends BasicParser {
 
   private Grok syslogGrok;
 
-  private static final Map<String, String> patternMap = ImmutableMap.<String, String> builder()
-      .put("su", "SUDO1")
-      .put("sshd", "SSH1")
+  private static final String[] suPatterns = {"SU1", "SU2", "SU3"};
+  private static final String[] sudoPatterns = {"SUDO1", "SUDO2", "SUDO3"};
+  private static final String[] sshPatterns = {"SSH1", "SSH2", "SSH3"};
+
+  private static final Map<String, String[]> patternMap = ImmutableMap.<String, String[]> builder()
+      .put("su", suPatterns)
+      .put("sudo", sudoPatterns)
+      .put("sshd", sshPatterns)
           .build();
 
-  private Map<String, Grok> grokers = new HashMap<String, Grok>(patternMap.size());
+  private MultiMap grokers = new MultiValueMap();
 
   @Override
   public void configure(Map<String, Object> parserConfig) {
@@ -73,7 +82,7 @@ public class BasicSyslogParser extends BasicParser {
     InputStream patternStream = this.getClass().getResourceAsStream("/patterns/syslog");
     grok.addPatternFromReader(new InputStreamReader(patternStream));
     grok.compile("%{" + pattern + "}");
-    grokers.put(key, grok);
+    grokers.put(key,grok);
   }
 
   @Override
@@ -88,11 +97,12 @@ public class BasicSyslogParser extends BasicParser {
       throw new RuntimeException(e.getMessage(), e);
     }
 
-    for (Entry<String, String> pattern : patternMap.entrySet()) {
+    for (Entry<String, String[]> patternList : patternMap.entrySet()) {
       try {
-        addGrok(pattern.getKey(), pattern.getValue());
+          for (String pattern: patternList.getValue()){
+        addGrok(patternList.getKey(), pattern);}
       } catch (GrokException e) {
-        LOG.error("[Metron] Failed to load grok pattern {} for Syslog  {}", pattern.getValue(), pattern.getKey());
+        LOG.error("[Metron] Failed to load grok pattern {} for Syslog  {}", patternList.getValue(), patternList.getKey());
       }
     }
 
@@ -148,15 +158,19 @@ public class BasicSyslogParser extends BasicParser {
 
     try {
       messagePattern = (String) syslogJson.get("syslog_program");
-      Grok programGrok = grokers.get(messagePattern);
+      ArrayList<Grok> programGrok = (ArrayList<Grok>) grokers.get(messagePattern);
 
       if (programGrok == null)
 	LOG.info("[Metron] No pattern for syslog '{}'", syslogJson.get("syslog_program"));
       else {
 
 	String messageContent = (String) syslogJson.get("syslog_message");
-	Match messageMatch = programGrok.match(messageContent);
-	messageMatch.captures();
+	Match messageMatch=null;
+	for (Grok grokP : programGrok) {
+        messageMatch = grokP.match(messageContent);
+        messageMatch.captures();
+        if (!messageMatch.isNull()) break;
+    }
 	if (!messageMatch.isNull()) {
 	  Map<String, Object> messageJson = messageMatch.toMap();
 	  LOG.trace("[Metron] Grok Syslog message matches: {}", messageMatch.toJson());
