@@ -22,7 +22,8 @@ import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.storm.task.TopologyContext;
 
 import org.apache.metron.common.Constants;
 import org.apache.metron.parsers.BasicParser;
@@ -42,6 +43,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -56,7 +58,7 @@ public class BasicSyslogParser extends BasicParser {
 
   private static final String[] suPatterns = {"SU1", "SU2", "SU3"};
   private static final String[] sudoPatterns = {"SUDO1", "SUDO2", "SUDO3"};
-  private static final String[] sshPatterns = {"SSH1", "SSH2", "SSH3"};
+  private static final String[] sshPatterns = { "SSH1", "SSH2", "SSH3", "SSH4", "SSH5", "SSH6", "SSH7", "SSH8", "SSH9", "SSH10", "SSH11"};
 
   private static final Map<String, String[]> patternMap = ImmutableMap.<String, String[]> builder()
       .put("su", suPatterns)
@@ -64,7 +66,7 @@ public class BasicSyslogParser extends BasicParser {
       .put("sshd", sshPatterns)
           .build();
 
-  private MultiMap grokers = new MultiValueMap();
+  private HashSetValuedHashMap grokers = new HashSetValuedHashMap();
 
   @Override
   public void configure(Map<String, Object> parserConfig) {
@@ -75,6 +77,7 @@ public class BasicSyslogParser extends BasicParser {
       deviceClock = Clock.systemUTC();
       LOG.warn("[Metron] No device time zone provided; defaulting to UTC");
     }
+
   }
 
   private void addGrok(String key, String pattern) throws GrokException {
@@ -97,17 +100,17 @@ public class BasicSyslogParser extends BasicParser {
       throw new RuntimeException(e.getMessage(), e);
     }
 
-    for (Entry<String, String[]> patternList : patternMap.entrySet()) {
-      try {
-          for (String pattern: patternList.getValue()){
-        addGrok(patternList.getKey(), pattern);}
-      } catch (GrokException e) {
-        LOG.error("[Metron] Failed to load grok pattern {} for Syslog  {}", patternList.getValue(), patternList.getKey());
+      for (Entry<String, String[]> patternList : patternMap.entrySet()) {
+          try {
+              for (String pattern: patternList.getValue()){
+                  addGrok(patternList.getKey(), pattern);}
+          } catch (GrokException e) {
+              LOG.error("[Metron] Failed to load grok pattern {} for Syslog  {}", patternList.getValue(), patternList.getKey());
+          }
       }
-    }
-
     LOG.info("[Metron] SYSLOG Parser Initialized");
   }
+
 
   @Override
   public List<JSONObject> parse(byte[] rawMessage) {
@@ -158,7 +161,7 @@ public class BasicSyslogParser extends BasicParser {
 
     try {
       messagePattern = (String) syslogJson.get("syslog_program");
-      ArrayList<Grok> programGrok = (ArrayList<Grok>) grokers.get(messagePattern);
+      Collection<Grok> programGrok = (Collection<Grok>) grokers.get(messagePattern);
 
       if (programGrok == null)
 	LOG.info("[Metron] No pattern for syslog '{}'", syslogJson.get("syslog_program"));
@@ -193,8 +196,29 @@ public class BasicSyslogParser extends BasicParser {
 	    metronJson.put("user_su", user_su.toLowerCase());
 
 	  String action = (String) messageJson.get("action");
-	  if (user_su != null)
-          metronJson.put("action", action.toLowerCase());
+        if (action != null)
+            metronJson.put("action", action.toLowerCase());
+
+
+      String ssh_daemon = (String) messageJson.get("ssh_daemon");
+        if (ssh_daemon != null)
+            metronJson.put("ssh_daemon", ssh_daemon.toLowerCase());
+
+      String ssh_submodule = (String) messageJson.get("ssh_submodule");
+        if (ssh_submodule != null)
+            metronJson.put("ssh_submodule", ssh_submodule.toLowerCase());
+
+      String user = (String) messageJson.get("user");
+        if (user != null)
+            metronJson.put("user", user.toLowerCase());
+
+      String ssh_module = (String) messageJson.get("ssh_module");
+        if (ssh_module != null)
+            metronJson.put("ssh_module", ssh_module.toLowerCase());
+
+      Integer recu = (Integer) messageJson.get("recu");
+        if (recu != null)
+            metronJson.put("recu", recu);
 	} else
 	  LOG.warn("[Metron] Message '{}' did not match pattern for syslog_program '{}'", logLine,
 	      syslogJson.get("syslog_program"));

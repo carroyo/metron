@@ -84,25 +84,133 @@ public class BasicSyslogParserTest {
     @Test
     public void testSU() {
         String rawMessage = "<164>Nov 22 20:39:23 metron su: pam_unix(su:session): session closed for user root";
-        JSONObject asaJson = syslogParser.parse(rawMessage.getBytes()).get(0);
-        assertEquals(asaJson.get("original_string"), rawMessage);
-        assertTrue(asaJson.get("user_su").equals("root"));
-        assertTrue(asaJson.get("action").equals("session closed"));
-        assertTrue((long) asaJson.get("timestamp") == 1511383163000L);
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("user_su").equals("root"));
+        assertTrue(testSyslogJson.get("action").equals("session closed"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
     }
 
     @Test
-    public void testSSH() {
+    public void testSSH1() {
         String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: Accepted publickey for centos from 172.24.4.1 port 43326 ssh2: RSA SHA256:iRj5Z9wt713JtJZdiMBtdvqCYUEQBZfiyDJECyw16aM";
-        JSONObject asaJson = syslogParser.parse(rawMessage.getBytes()).get(0);
-        assertEquals(asaJson.get("original_string"), rawMessage);
-        assertTrue(asaJson.get("ip_src_addr").equals("172.24.4.1"));
-        assertTrue(asaJson.get("ip_src_port").equals(43326));
-        assertTrue((long) asaJson.get("timestamp") == 1511383163000L);
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(43326));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
     }
 
+    @Test
+    public void testSSH2() {
+        String rawMessage = "<162>Nov 22 20:39:23 sensor01 sshd[6917]: Received disconnect from 172.24.4.1 port 37200:11: disconnected by user";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(37200));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
 
-    
+    @Test
+    public void testSSH3() {
+        String rawMessage = "<162>Nov 22 20:39:23 sensor01 sshd[12899]: Disconnected from 172.24.4.1 port 50978";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(50978));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH4() {
+        String rawMessage = "<162>Nov 22 20:39:23 sensor01 sshd[22302]: pam_unix(sshd:session): session closed for user centos";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("user").equals("centos"));
+        assertTrue(testSyslogJson.get("action").equals("closed"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH5() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: Invalid user test from 172.24.4.1 port 56654";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue(testSyslogJson.get("user").equals("test"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(56654));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH6() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: input_userauth_request: invalid user test [preauth]";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ssh_module").equals("input_userauth_request"));
+        assertTrue(testSyslogJson.get("user").equals("test"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH7() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: pam_unix(sshd:auth): check pass; user unknown";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ssh_module").equals("pam_unix"));
+        assertTrue(testSyslogJson.get("ssh_submodule").equals("auth"));
+        assertTrue(testSyslogJson.get("ssh_daemon").equals("sshd"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH8() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.24.4.1";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("ssh_module").equals("pam_unix"));
+        assertTrue(testSyslogJson.get("ssh_submodule").equals("auth"));
+        assertTrue(testSyslogJson.get("ssh_daemon").equals("sshd"));
+        assertTrue(testSyslogJson.get("action").equals("authentication failure"));
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH9() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]:  Failed password for invalid user test from 172.24.4.1 port 36354 ssh2";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("action").equals("failed password"));
+        assertTrue(testSyslogJson.get("user").equals("test"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(36354));
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH10() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]: Failed password for centos from 172.24.4.1 port 42680 ssh2";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("action").equals("failed password"));
+        assertTrue(testSyslogJson.get("user").equals("centos"));
+        assertTrue(testSyslogJson.get("ip_src_port").equals(42680));
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
+
+    @Test
+    public void testSSH11() {
+        String rawMessage = "<162>Nov 22 20:39:23 metron sshd[7727]:  PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=172.24.4.1  user=centos";
+        JSONObject testSyslogJson = syslogParser.parse(rawMessage.getBytes()).get(0);
+        assertEquals(testSyslogJson.get("original_string"), rawMessage);
+        assertTrue(testSyslogJson.get("action").equals("authentication failures"));
+        assertTrue(testSyslogJson.get("user").equals("centos"));
+        assertTrue(testSyslogJson.get("recu").equals(2));
+        assertTrue(testSyslogJson.get("ip_src_addr").equals("172.24.4.1"));
+        assertTrue((long) testSyslogJson.get("timestamp") == 1511383163000L);
+    }
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
