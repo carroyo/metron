@@ -104,7 +104,7 @@ public class FieldTransformer implements Serializable {
   }
 
   public Map<String, Object> transform(JSONObject input, Context context, Map<String, Object>... sensorConfig) {
-    if(getInput() == null || getInput().isEmpty()) {
+    if(getInput() == null || getInput().isEmpty()|| getInput().contains("any") ){
       return transformation.map(input, getOutput(), config, context, sensorConfig);
     }
     else {

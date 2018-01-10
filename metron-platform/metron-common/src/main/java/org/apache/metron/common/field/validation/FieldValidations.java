@@ -38,6 +38,7 @@ public enum FieldValidations {
   ,INTEGER(new IntegerValidation())
   ,REGEX_MATCH(new RegexValidation())
   ,NOT_EMPTY(new NotEmptyValidation())
+  ,CIM(new CIMValidation())
   ;
   private FieldValidation validation;
   FieldValidations(FieldValidation validation) {
